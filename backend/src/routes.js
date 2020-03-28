@@ -13,7 +13,7 @@ routes.get('/about', (request, response) => {
     });
 });
 
-routes.post('session', SessionController.login);
+routes.post('/session', SessionController.login);
 
 routes.post('/ongs', ONGController.create);
 routes.get('/ongs', ONGController.list);
