@@ -12,14 +12,26 @@ export default function Incidents() {
     const navigation = useNavigation();
     const [incidents, setIncidents] = useState([]);
     const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
 
     async function loadIncidents() {
+        if (loading) {
+            return;
+        }
+
+        if (total > 0 && incidents.length === total) {
+            return;
+        }
+        
         try {
-            const response = await api.get('/incidents');
+            const response = await api.get('/incidents', {
+                params: {page}
+            });
             
-            setIncidents(response.data);
+            setIncidents([...incidents, ...response.data]);
             setTotal(response.headers['x-total-count']);
-            console.log(total);
+            setPage(page + 1);
         } catch(err) {
             console.log(err);
         }
@@ -29,8 +41,8 @@ export default function Incidents() {
         loadIncidents();
     }, []);
 
-    function navigateToDetails() {
-        navigation.navigate('Details');
+    function navigateToDetails(incident) {
+        navigation.navigate('Details', {incident});
     }
 
     return (
@@ -49,6 +61,8 @@ export default function Incidents() {
                 keyExtractor={incident => String(incident.id)}
                 style={styles.incidentList}
                 showsVerticalScrollIndicator={false}
+                onEndReached={loadIncidents}
+                onEndReachedThreshold={.2}
                 renderItem={({ item: incident }) => (
                     <View style={styles.incident}>
                     <Text style={styles.incidentProperty}>ONG:</Text>
@@ -64,7 +78,7 @@ export default function Incidents() {
                     
                     <TouchableOpacity 
                         style={styles.detailsButton} 
-                        onPress={navigateToDetails}>
+                        onPress={() => navigateToDetails(incident)}>
                             <Text style={styles.detailsButtonText}>Ver mais detalhes</Text>
                             <Feather name='arrow-right' size={16} color='#e02041' />
                     </TouchableOpacity>
