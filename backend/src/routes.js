@@ -19,6 +19,7 @@ routes.post('/ongs', ONGController.create);
 routes.get('/ongs', ONGController.list);
 
 routes.get('/incidents', IncidentController.list);
+routes.get('/incidents/:id', IncidentController.details );
 
 routes.get('/profile', ProfileController.list);
 routes.post('/incidents', ProfileController.create);
